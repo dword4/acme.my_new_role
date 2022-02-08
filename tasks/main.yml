@@ -1,0 +1,20 @@
+---
+# tasks file for acme.my_new_role
+# add a user
+- name: add local user
+  ansible.builtin.user:
+    name: dhynes
+    create_home: yes
+- name: gather package facts
+  ansible.builtin.package_facts:
+    manager: auto
+- name: install vim if its not present
+  action: >
+    {{ ansible_pkg_mgr }} name=vim state=present update_cache=yes
+  when: "'vim' not in ansible_facts.packages"
+# get vim configs from git
+- name: clone vim settings from git repo
+  ansible.builtin.shell: git clone https://github.com/dword4/vim.git /home/dhynes/.vim/
+# move config to the right place
+- name: move .vimrc around
+  ansible.builtin.shell: cp /home/dhynes/.vim/.vimrc /home/dhynes/ 
